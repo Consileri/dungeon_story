@@ -9,7 +9,7 @@ class Board:
 
         self.left = 10
         self.top = 10
-        self.cell_size = 50
+        self.cell_size = 20
 
     def set_view(self, left, top, cell_size):
         self.left = left
@@ -39,10 +39,10 @@ class Board:
 
 
 pygame.init()
-size = width, height = 1000, 1000
+size = width, height = 1900, 1000
 surf = pygame.display.set_mode(size)
 
-board = Board(5, 7)
+board = Board(64, 32)
 running = True
 while running:
     for event in pygame.event.get():
