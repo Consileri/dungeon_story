@@ -38,6 +38,12 @@ class Board:
         return x1, y1
 
 
+class Block:  # начал класс блоков
+    def __init__(self, pos_x, pos_y):
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+
+
 pygame.init()
 size = width, height = 1900, 1000
 surf = pygame.display.set_mode(size)
