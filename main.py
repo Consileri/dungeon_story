@@ -1,5 +1,8 @@
 import pygame
 
+WIDTH_GG = 1
+HEIGHT_GG = 2
+MOVE_SPEED = 2
 
 class Board:
     def __init__(self, width, height):
@@ -9,7 +12,7 @@ class Board:
 
         self.left = 10
         self.top = 10
-        self.cell_size = 50
+        self.cell_size = 20
 
     def set_view(self, left, top, cell_size):
         self.left = left
@@ -38,11 +41,35 @@ class Board:
         return x1, y1
 
 
+class Player:
+    def __init__(self, x, y):
+        self.xvel = 0
+        self.startX = x
+        self.startY = y
+        self.image = pygame.Surface((WIDTH_GG, HEIGHT_GG))
+        self.image.fill(pygame.Color('yellow'))
+        self.rect = pygame.Rect(x, y, WIDTH_GG, HEIGHT_GG)
+
+    def update(self, left, right):
+        if left:
+            self.xvel = -MOVE_SPEED  # Лево = x- n
+
+        if right:
+            self.xvel = MOVE_SPEED  # Право = x + n
+
+        if not (left or right):  # стоим, когда нет указаний идти
+            self.xvel = 0
+
+        self.rect.x += self.xvel  # переносим свои положение на xvel
+
+    def draw(self, screen):  # выводим на экран героя
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+
 pygame.init()
-size = width, height = 1000, 1000
+size = width, height = 1900, 1000
 surf = pygame.display.set_mode(size)
 
-board = Board(5, 7)
+board = Board(64, 32)
 running = True
 while running:
     for event in pygame.event.get():
