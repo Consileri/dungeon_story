@@ -20,14 +20,14 @@ def load_image(name, colorkey=None):
 
 
 class Board:
-    def __init__(self, width, height):
+    def __init__(self, width, height, cell_size):
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
 
         self.left = 10
         self.top = 10
-        self.cell_size = 20
+        self.cell_size = cell_size
 
     def set_view(self, left, top, cell_size):
         self.left = left
