@@ -1,8 +1,22 @@
 import pygame
+import os
 
+WIDTH_BOSS = 4
+HEIGHT_BOSS = 2
 WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    try:
+        image = pygame.image.load(fullname)
+    except pygame.error as message:
+        print("Can't load image:", name)
+        raise SystemExit(message)
+    image = image.convert_alpha()
+    return image
 
 
 class Board:
@@ -47,8 +61,10 @@ class MainScreen:  # todo класс заставки
                  'Нажмите кнопку'
                  'Начать']
 
+    background = pygame.transform.scale(load_image('fon.jpg'), (500, 500))
 
-class Player:
+
+class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         self.xvel = 0
         self.startX = x
@@ -86,7 +102,10 @@ class Block:  # todo класс блоков
 
 
 class Mob(pygame.sprite.Sprite):  # todo класс врагов
-    pass
+    def __init__(self, x, y):
+        self.startX = x
+        self.startY = y
+        self.image = pygame.Surface((WIDTH_BOSS, HEIGHT_BOSS))
 
 
 class Boss(pygame.sprite.Sprite):  # todo класс босса
