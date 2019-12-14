@@ -4,6 +4,7 @@ WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
 
+
 class Board:
     def __init__(self, width, height):
         self.width = width
@@ -41,6 +42,12 @@ class Board:
         return x1, y1
 
 
+class MainScreen:  # todo класс заставки
+    introtext = ['Чтобы начать игру,'
+                 'Нажмите кнопку'
+                 'Начать']
+
+
 class Player:
     def __init__(self, x, y):
         self.xvel = 0
@@ -64,6 +71,27 @@ class Player:
 
     def draw(self, screen):  # выводим на экран героя
         screen.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Block:  # todo класс блоков
+    def __init__(self, x, y):
+        self.startX = x
+        self.startY = y
+        self.image = pygame.Surface((WIDTH_GG, 1))
+        self.image.fill(pygame.Color('brown'))
+        self.rect = pygame.Rect(x, y, WIDTH_GG, 1)
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Mob(pygame.sprite.Sprite):  # todo класс врагов
+    pass
+
+
+class Boss(pygame.sprite.Sprite):  # todo класс босса
+    pass
+
 
 pygame.init()
 size = width, height = 1900, 1000
