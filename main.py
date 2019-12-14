@@ -1,4 +1,22 @@
 import pygame
+import os
+
+WIDTH_BOSS = 4
+HEIGHT_BOSS = 2
+WIDTH_GG = 1
+HEIGHT_GG = 2
+MOVE_SPEED = 2
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    try:
+        image = pygame.image.load(fullname)
+    except pygame.error as message:
+        print("Can't load image:", name)
+        raise SystemExit(message)
+    image = image.convert_alpha()
+    return image
 
 
 class Board:
@@ -38,10 +56,60 @@ class Board:
         return x1, y1
 
 
-class Block:  # начал класс блоков
-    def __init__(self, pos_x, pos_y):
-        self.pos_x = pos_x
-        self.pos_y = pos_y
+class MainScreen:  # todo класс заставки
+    introtext = ['Чтобы начать игру,'
+                 'Нажмите кнопку'
+                 'Начать']
+
+    background = pygame.transform.scale(load_image('fon.jpg'), (500, 500))
+
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        self.xvel = 0
+        self.startX = x
+        self.startY = y
+        self.image = pygame.Surface((WIDTH_GG, HEIGHT_GG))
+        self.image.fill(pygame.Color('yellow'))
+        self.rect = pygame.Rect(x, y, WIDTH_GG, HEIGHT_GG)
+
+    def update(self, left, right):
+        if left:
+            self.xvel = -MOVE_SPEED  # Лево = x- n
+
+        if right:
+            self.xvel = MOVE_SPEED  # Право = x + n
+
+        if not (left or right):  # стоим, когда нет указаний идти
+            self.xvel = 0
+
+        self.rect.x += self.xvel  # переносим свои положение на xvel
+
+    def draw(self, screen):  # выводим на экран героя
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Block:  # todo класс блоков
+    def __init__(self, x, y):
+        self.startX = x
+        self.startY = y
+        self.image = pygame.Surface((WIDTH_GG, 1))
+        self.image.fill(pygame.Color('brown'))
+        self.rect = pygame.Rect(x, y, WIDTH_GG, 1)
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Mob(pygame.sprite.Sprite):  # todo класс врагов
+    def __init__(self, x, y):
+        self.startX = x
+        self.startY = y
+        self.image = pygame.Surface((WIDTH_BOSS, HEIGHT_BOSS))
+
+
+class Boss(pygame.sprite.Sprite):  # todo класс босса
+    pass
 
 
 pygame.init()
