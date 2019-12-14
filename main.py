@@ -110,20 +110,3 @@ class Mob(pygame.sprite.Sprite):  # todo класс врагов
 
 class Boss(pygame.sprite.Sprite):  # todo класс босса
     pass
-
-
-pygame.init()
-size = width, height = 1900, 1000
-surf = pygame.display.set_mode(size)
-
-board = Board(64, 32)
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            print(board.get_cell(event.pos))
-    surf.fill((0, 0, 0))
-    board.render(surf)
-    pygame.display.flip()
