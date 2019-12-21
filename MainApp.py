@@ -1,13 +1,13 @@
 import pygame
 from main import Block, Boss, Mob, Player, Board
 
-COLUMS = 256
-ROWS = 16
-CELL_CIZE = 20
+COLUMS = 26
+ROWS = 256
+CELL_CIZE = 40
 
 pygame.init()
 
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 size = width, height = screen.get_rect()[2:]
 print(size)
 running = True
