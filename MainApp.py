@@ -9,8 +9,9 @@ size = width, height = screen.get_rect()[2:]
 print(size)
 running = True
 
-block = Block(2, 2)
-board = Board(size[0] // 20 - 1, size[1] // 20 - 1)
+block = Block(5, 5)
+cell_size = 80
+board = Board(size[0] // cell_size , size[1] // cell_size , cell_size)
 player = Player(3, 3)
 boss = Boss()
 mob = Mob()
