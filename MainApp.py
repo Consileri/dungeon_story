@@ -1,13 +1,22 @@
 import pygame
+from main import Block, Boss, Mob, MainScreen, Player, Board
 
 
 pygame.init()
-size = width, height = 800, 600
-screen = pygame.display.set_mode(size)
 
-
-
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+size = width, height = screen.get_rect()[2:]
+print(size)
 running = True
+
+block = Block(5, 5)
+cell_size = 80
+board = Board(size[0] // cell_size , size[1] // cell_size , cell_size)
+player = Player(3, 3)
+boss = Boss()
+mob = Mob()
+
+
 while running:
 
     for event in pygame.event.get():
@@ -15,25 +24,25 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-         #Выход при нажатии Esc
+        # Выход при нажатии Esc
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-         #Пробел
+        # Пробел
         if event.type == pygame.KEYDOWN:
             if event.unicode == ' ':
                 pass
-         #W
+        # W
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
                 pass
-         #A
+        # A
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
                 pass
-         #D
+        # D
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_d:
                 pass
-
+    board.render(screen)
     pygame.display.flip()
