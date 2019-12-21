@@ -1,5 +1,5 @@
 import pygame
-from main import Block, Boss, Mob, MainScreen, Player, Board
+from main import Block, Boss, Mob, Player, Board
 
 
 pygame.init()
@@ -11,14 +11,13 @@ running = True
 
 block = Block(5, 5)
 cell_size = 80
-board = Board(size[0] // cell_size , size[1] // cell_size , cell_size)
+board = Board(size[0] // cell_size , size[1] // cell_size, cell_size)
 player = Player(3, 3)
 boss = Boss()
-mob = Mob()
+mob = Mob(5, 6)
 
 
 while running:
-
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
