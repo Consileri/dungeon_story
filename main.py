@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 import os
 
@@ -6,6 +8,16 @@ HEIGHT_BOSS = 2
 WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
+FPS = 60
+
+size = width, height = 500, 500
+screen = pygame.display.set_mode(size)
+clock = pygame.time.Clock()
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
 
 
 def load_image(name, colorkey=None):
@@ -17,6 +29,34 @@ def load_image(name, colorkey=None):
         raise SystemExit(message)
     image = image.convert_alpha()
     return image
+
+
+def main_screen():  # todo класс заставки
+    introtext = ['Чтобы начать игру,'
+                 'Нажмите кнопку'
+                 'Начать']
+
+    background = pygame.transform.scale(load_image('fon.jpg'), (500, 500))
+    screen.blit(background, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in introtext:
+        string_rendered = font.render(line, 1, pygame.Color('black'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                return
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 class Board:
@@ -54,14 +94,6 @@ class Board:
             return None
 
         return x1, y1
-
-
-class MainScreen:  # todo класс заставки
-    introtext = ['Чтобы начать игру,'
-                 'Нажмите кнопку'
-                 'Начать']
-
-    background = pygame.transform.scale(load_image('fon.jpg'), (500, 500))
 
 
 class Player(pygame.sprite.Sprite):
@@ -112,18 +144,21 @@ class Boss(pygame.sprite.Sprite):  # todo класс босса
     pass
 
 
-pygame.init()
-size = width, height = 1900, 1000
-surf = pygame.display.set_mode(size)
+# def load_level(filename):
+#     filename = "data/" + filename
+#     # читаем уровень, убирая символы перевода строки
+#     with open(filename, 'r') as mapFile:
+#         level_map = [line.strip() for line in mapFile]
+#
+#     # и подсчитываем максимальную длину
+#     max_width = max(map(len, level_map))
+#
+#     # дополняем каждую строку пустыми клетками ('.')
+#     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+#
+#
+# tile_images = {'wall': load_image('box.png'), 'empty': load_image('grass.png')}
+# player_image = load_image('mar.png')
+#
+# tile_width = tile_height = 50
 
-board = Board(64, 32)
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            print(board.get_cell(event.pos))
-    surf.fill((0, 0, 0))
-    board.render(surf)
-    pygame.display.flip()
