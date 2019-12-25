@@ -1,9 +1,9 @@
 import pygame, sys, os
 from main import Block, Boss, Mob, Player, Board
 
-COLUMS = 26
+COLUMS = 33
 ROWS = 256
-CELL_CIZE = 40
+CELL_CIZE = 32
 
 pygame.init()
 
@@ -18,6 +18,8 @@ WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
 FPS = 60
+BACKGROUNDCOLOR = pygame.Color(64, 32, 0)
+TEXTCOLOR = pygame.Color(218, 189, 171)
 
 def terminate():
     pygame.quit()
@@ -38,17 +40,29 @@ def load_image(name, colorkey=None):
 def main_screen():  # todo класс заставки
     introtext = ['Чтобы начать игру, '
                  'Нажмите любую кнопку']
+    nametext = ['Dungeon story']
 
     background = pygame.transform.scale(load_image('fon.jpg'), (1920, 1080))
     screen.blit(background, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
+    intro_font = pygame.font.Font(None, 75)
+    name_font = pygame.font.Font(None, 125)
+    text_coord = 975
+    name_coord = 50
+
+    name_rendered = name_font.render(nametext[0], 1, TEXTCOLOR)
+    name_rect = name_rendered.get_rect()
+    name_coord += 10
+    name_rect.top = name_coord
+    name_rect.x = 680
+    name_coord += name_rect.height
+    screen.blit(name_rendered, name_rect)
+
     for line in introtext:
-        string_rendered = font.render(line, 1, pygame.Color('black'))
+        string_rendered = intro_font.render(line, 1, TEXTCOLOR)
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 770
+        intro_rect.x = 410
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -76,7 +90,7 @@ mob = Mob(5, 6)
 
 main_screen()
 while running:
-    screen.fill((0, 0, 0))
+    screen.fill(BACKGROUNDCOLOR)
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
