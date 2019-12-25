@@ -1,7 +1,4 @@
-import sys
-
 import pygame
-import os
 
 WIDTH_BOSS = 4
 HEIGHT_BOSS = 2
