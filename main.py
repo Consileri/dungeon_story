@@ -1,22 +1,15 @@
 import pygame
-import os
 
 WIDTH_BOSS = 4
 HEIGHT_BOSS = 2
 WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
+FPS = 60
 
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
-    try:
-        image = pygame.image.load(fullname)
-    except pygame.error as message:
-        print("Can't load image:", name)
-        raise SystemExit(message)
-    image = image.convert_alpha()
-    return image
+size = width, height = 500, 500
+screen = pygame.display.set_mode(size)
+clock = pygame.time.Clock()
 
 
 class Board:
@@ -54,14 +47,6 @@ class Board:
             return None
 
         return x1, y1
-
-
-class MainScreen:  # todo класс заставки
-    introtext = ['Чтобы начать игру,'
-                 'Нажмите кнопку'
-                 'Начать']
-
-    background = pygame.transform.scale(load_image('fon.jpg'), (500, 500))
 
 
 class Player(pygame.sprite.Sprite):
@@ -110,3 +95,23 @@ class Mob(pygame.sprite.Sprite):  # todo класс врагов
 
 class Boss(pygame.sprite.Sprite):  # todo класс босса
     pass
+
+
+# def load_level(filename):
+#     filename = "data/" + filename
+#     # читаем уровень, убирая символы перевода строки
+#     with open(filename, 'r') as mapFile:
+#         level_map = [line.strip() for line in mapFile]
+#
+#     # и подсчитываем максимальную длину
+#     max_width = max(map(len, level_map))
+#
+#     # дополняем каждую строку пустыми клетками ('.')
+#     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+#
+#
+# tile_images = {'wall': load_image('box.png'), 'empty': load_image('grass.png')}
+# player_image = load_image('mar.png')
+#
+# tile_width = tile_height = 50
+
