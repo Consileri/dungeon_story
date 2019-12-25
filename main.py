@@ -15,59 +15,15 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
 
-def terminate():
-    pygame.quit()
-    sys.exit()
-
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
-    try:
-        image = pygame.image.load(fullname)
-    except pygame.error as message:
-        print("Can't load image:", name)
-        raise SystemExit(message)
-    image = image.convert_alpha()
-    return image
-
-
-def main_screen():  # todo класс заставки
-    introtext = ['Чтобы начать игру,'
-                 'Нажмите кнопку'
-                 'Начать']
-
-    background = pygame.transform.scale(load_image('fon.jpg'), (500, 500))
-    screen.blit(background, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
-    for line in introtext:
-        string_rendered = font.render(line, 1, pygame.Color('black'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                return
-        pygame.display.flip()
-        clock.tick(FPS)
-
-
 class Board:
-    def __init__(self, width, height):
+    def __init__(self, width, height, cell_size):
         self.width = width
         self.height = height
         self.board = [[0] * width for _ in range(height)]
 
         self.left = 10
         self.top = 10
-        self.cell_size = 20
+        self.cell_size = cell_size
 
     def set_view(self, left, top, cell_size):
         self.left = left
