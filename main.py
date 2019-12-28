@@ -1,7 +1,7 @@
 import pygame
 
-WIDTH_BOSS = 4
-HEIGHT_BOSS = 2
+WIDTH_BOSS = 3
+HEIGHT_BOSS = 3
 WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
@@ -74,7 +74,7 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
 
-class Block:  # todo класс блоков
+class Block:
     def __init__(self, x, y):
         self.startX = x
         self.startY = y
@@ -86,12 +86,27 @@ class Block:  # todo класс блоков
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
 
-class Mob(pygame.sprite.Sprite):  # todo класс врагов
+class Mob(pygame.sprite.Sprite):  # todo класс мобов
+    def __init__(self, x, y):
+        self.startX = x
+        self.startY = y
+        self.image = pygame.Surface((1, 2))
+
+    def update(self):  # todo функцию перемещения мобов
+        pass
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Boss(pygame.sprite.Sprite):  # todo класс босса
     def __init__(self, x, y):
         self.startX = x
         self.startY = y
         self.image = pygame.Surface((WIDTH_BOSS, HEIGHT_BOSS))
 
+    def update(self):  # todo функцию перемещения босса
+        pass
 
-class Boss(pygame.sprite.Sprite):  # todo класс босса
-    pass
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
