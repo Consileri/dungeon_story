@@ -1,6 +1,7 @@
 import pygame, sys, os
 from main import Block, Boss, Mob, Player, Board
 
+
 COLUMS = 33
 ROWS = 256
 CELL_CIZE = 32
@@ -20,6 +21,9 @@ MOVE_SPEED = 2
 FPS = 60
 BACKGROUNDCOLOR = pygame.Color(64, 32, 0)
 TEXTCOLOR = pygame.Color(218, 189, 171)
+TILE_WIDTH = 32
+TILE_HEIGHT = 32
+FONT = 'agencyfb'
 
 def terminate():
     pygame.quit()
@@ -44,16 +48,16 @@ def main_screen():  # todo класс заставки
 
     background = pygame.transform.scale(load_image('fon.jpg'), (1920, 1080))
     screen.blit(background, (0, 0))
-    intro_font = pygame.font.Font(None, 75)
-    name_font = pygame.font.Font(None, 125)
-    text_coord = 975
+    intro_font = pygame.font.Font(None, 50)
+    name_font = pygame.font.SysFont(FONT, 150)
+    text_coord = 1000
     name_coord = 50
 
     name_rendered = name_font.render(nametext[0], 1, TEXTCOLOR)
     name_rect = name_rendered.get_rect()
     name_coord += 10
     name_rect.top = name_coord
-    name_rect.x = 680
+    name_rect.x = 650
     name_coord += name_rect.height
     screen.blit(name_rendered, name_rect)
 
@@ -62,7 +66,7 @@ def main_screen():  # todo класс заставки
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 410
+        intro_rect.x = 600
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -73,9 +77,54 @@ def main_screen():  # todo класс заставки
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     terminate()
-            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                else:
+                    return
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 return
 
+        pygame.display.flip()
+        clock.tick(FPS)
+
+def game_menu():
+    exit_text = ['Выход']
+    continue_text = ['Продолжить']
+
+    background = pygame.transform.scale(load_image('menu.jpg'), (1920, 1080))
+    screen.blit(background, (0, 0))
+    exit_font = pygame.font.Font(None, 100)
+    continue_font = pygame.font.Font(None, 100)
+    exit_coord = 600
+    continue_coord = 400
+
+    exit_rendered = exit_font.render(exit_text[0], 1, TEXTCOLOR)
+    exit_rect = exit_rendered.get_rect()
+    exit_coord += 10
+    exit_rect.top = exit_coord
+    exit_rect.x = 650
+    exit_coord += exit_rect.height
+    screen.blit(exit_rendered, exit_rect)
+
+    continue_rendered = continue_font.render(continue_text[0], 1, TEXTCOLOR)
+    continue_rect = continue_rendered.get_rect()
+    continue_coord += 10
+    continue_rect.top = continue_coord
+    continue_rect.x = 650
+    continue_coord += continue_rect.height
+    screen.blit(continue_rendered, continue_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+                if (pos[0] > exit_rect.x and pos[0] < (exit_rect.width + exit_rect.x)) and (pos[1] > exit_rect.y and pos[1] < (exit_rect.height + exit_rect.y)):
+                    terminate()
+                elif (pos[0] > continue_rect.x and pos[0] < (continue_rect.width + continue_rect.x)) and (pos[1] > continue_rect.y and pos[1] < (continue_rect.height + continue_rect.y)):
+                    return
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -88,6 +137,7 @@ player = Player(3, 3)
 boss = Boss()
 mob = Mob(5, 6)
 
+
 main_screen()
 while running:
     screen.fill(BACKGROUNDCOLOR)
@@ -99,7 +149,7 @@ while running:
         # Выход при нажатии Esc
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                running = False
+                game_menu()
         # Пробел
         if event.type == pygame.KEYDOWN:
             if event.unicode == ' ':
@@ -107,7 +157,7 @@ while running:
         # W
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                pass
+                running = False
         # A
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
