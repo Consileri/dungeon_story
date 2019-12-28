@@ -19,12 +19,20 @@ def generate_level(level):
     new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
-            if level[y][x] == '.':
+            if level[y][x] == ' ':
                 Tile('empty', x, y)
             elif level[y][x] == '#':
                 Tile('wall', x, y)
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
+            elif level[y][x] == '$':
+                Tile('demon_boss', x, y)
+            elif level[y][x] == '!':
+                Tile('knight', x, y)
+            elif level[y][x] == '*':
+                Tile('undead', x, y)
+            elif level[y][x] == '&':
+                Tile('wizard', x, y)
     print(new_player, x, y)
     return new_player, x, y
