@@ -30,7 +30,7 @@ def terminate():
     sys.exit()
 
 
-def load_image(name, colorkey=None):
+def load_image(name):
     fullname = os.path.join('data', name)
     try:
         image = pygame.image.load(fullname)
@@ -57,7 +57,7 @@ def main_screen():  # todo класс заставки
     name_rect = name_rendered.get_rect()
     name_coord += 10
     name_rect.top = name_coord
-    name_rect.x = 650
+    name_rect.x = (1920 - name_rect.width) // 2
     name_coord += name_rect.height
     screen.blit(name_rendered, name_rect)
 
@@ -66,7 +66,7 @@ def main_screen():  # todo класс заставки
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 600
+        intro_rect.x = (1920 - intro_rect.width) // 2
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -100,7 +100,7 @@ def game_menu():
     exit_rect = exit_rendered.get_rect()
     exit_coord += 10
     exit_rect.top = exit_coord
-    exit_rect.x = 650
+    exit_rect.x = (1920 - exit_rect.width) // 2
     exit_coord += exit_rect.height
     screen.blit(exit_rendered, exit_rect)
 
@@ -108,7 +108,7 @@ def game_menu():
     continue_rect = continue_rendered.get_rect()
     continue_coord += 10
     continue_rect.top = continue_coord
-    continue_rect.x = 650
+    continue_rect.x = (1920 - continue_rect.width) // 2
     continue_coord += continue_rect.height
     screen.blit(continue_rendered, continue_rect)
 
