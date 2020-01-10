@@ -82,7 +82,10 @@ class Player(pygame.sprite.Sprite):
         if self.jump:
             self.yvel += 2
             self.rect.top += self.yvel
+            if self.contact:
+                self.jump = False
 
+        self.contact = False
 
     def draw(self, screen):  # выводим на экран героя
         screen.blit(self.image, (self.rect.x, self.rect.y))
