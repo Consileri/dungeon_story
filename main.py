@@ -6,6 +6,7 @@ WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
 FPS = 60
+JUMP = True
 
 size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
@@ -52,23 +53,36 @@ class Board:
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
         self.xvel = 0
+        self.yvel = 0
         self.startX = x
         self.startY = y
+        self.contact = False
+        self.jump = JUMP
         self.image = pygame.Surface((WIDTH_GG, HEIGHT_GG))
         self.image.fill(pygame.Color('yellow'))
         self.rect = pygame.Rect(x, y, WIDTH_GG, HEIGHT_GG)
 
-    def update(self, left, right):
+    def update(self, left, right, up):
         if left:
             self.xvel = -MOVE_SPEED  # Лево = x- n
 
         if right:
             self.xvel = MOVE_SPEED  # Право = x + n
 
+        if up:
+            if self.contact:
+                self.jump = True
+                self.yvel -= 4
+
         if not (left or right):  # стоим, когда нет указаний идти
             self.xvel = 0
 
         self.rect.x += self.xvel  # переносим свои положение на xvel
+
+        if self.jump:
+            self.yvel += 2
+            self.rect.top += self.yvel
+
 
     def draw(self, screen):  # выводим на экран героя
         screen.blit(self.image, (self.rect.x, self.rect.y))
