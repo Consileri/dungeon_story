@@ -6,7 +6,11 @@ WIDTH_GG = 1
 HEIGHT_GG = 2
 MOVE_SPEED = 2
 FPS = 60
-JUMP = True
+JUMP_POWER = 10
+GRAVITY = 0.35
+PLATFORM_WIDTH = 32
+PLATFORM_HEIGHT = 32
+PLATFORM_COLOR = "#FF6262"
 
 size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
@@ -56,13 +60,15 @@ class Player(pygame.sprite.Sprite):
         self.yvel = 0
         self.startX = x
         self.startY = y
+        self.yvel = 0  # скорость вертикального перемещения
+        self.onGround = False  # находится ли герой на поверхности
         self.contact = False
-        self.jump = JUMP
+        self.jump = JUMP_POWER
         self.image = pygame.Surface((WIDTH_GG, HEIGHT_GG))
         self.image.fill(pygame.Color('yellow'))
         self.rect = pygame.Rect(x, y, WIDTH_GG, HEIGHT_GG)
 
-    def update(self, left, right, up):
+    def update(self, left, right, up, platforms):
         if left:
             self.xvel = -MOVE_SPEED  # Лево = x- n
 
@@ -70,50 +76,89 @@ class Player(pygame.sprite.Sprite):
             self.xvel = MOVE_SPEED  # Право = x + n
 
         if up:
-            if self.contact:
-                self.jump = True
-                self.yvel -= 4
+            if self.onGround:  # прыгаем, только когда можем оттолкнуться от земли
+                self.yvel = -JUMP_POWER
 
         if not (left or right):  # стоим, когда нет указаний идти
             self.xvel = 0
 
+        if not self.onGround:
+            self.yvel += GRAVITY
+        self.onGround = False
+
+        self.rect.y += self.yvel
+        self.collide(0, self.yvel, platforms)
+
         self.rect.x += self.xvel  # переносим свои положение на xvel
+        self.collide(self.xvel, 0, platforms)
 
-        if self.jump:
-            self.yvel += 2
-            self.rect.top += self.yvel
-            if self.contact:
-                self.jump = False
+    def collide(self, xvel, yvel, platforms):
+        for p in platforms:
+            if pygame.sprite.collide_rect(self, p): # если есть пересечение платформы с игроком
 
-        self.contact = False
+                if xvel > 0:                       # если движется вправо
+                    self.rect.right = p.rect.left  # то не движется вправо
 
-    def draw(self, screen):  # выводим на экран героя
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+                if xvel < 0:                       # если движется влево
+                    self.rect.left = p.rect.right  # то не движется влево
+
+                if yvel > 0:                       # если падает вниз
+                    self.rect.bottom = p.rect.top  # то не падает вниз
+                    self.onGround = True           # и становится на что-то твердое
+                    self.yvel = 0                  # и энергия падения пропадает
+
+                if yvel < 0:                       # если движется вверх
+                    self.rect.top = p.rect.bottom  # то не движется вверх
+                    self.yvel = 0                  # и энергия прыжка пропадает
 
 
-class Block:
+class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        self.startX = x
-        self.startY = y
-        self.image = pygame.Surface((WIDTH_GG, 1))
-        self.image.fill(pygame.Color('brown'))
-        self.rect = pygame.Rect(x, y, WIDTH_GG, 1)
-
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
+        self.image.fill(pygame.Color(PLATFORM_COLOR))
+        self.rect = pygame.Rect(x, y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
 
 
 class Mob(pygame.sprite.Sprite):  # todo класс мобов
-    def __init__(self, x, y):
-        self.startX = x
+    def __init__(self, x, y, left, up, maxLengthLeft, maxLengthUp, pyganim=None):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((5, 6))
+        self.image.fill(pygame.Color('black'))
+        self.rect = pygame.Rect(x, y, 5, 6)
+        self.image.set_colorkey(pygame.Color('black'))
+        self.startX = x  # начальные координаты
         self.startY = y
-        self.image = pygame.Surface((1, 2))
+        self.maxLengthLeft = maxLengthLeft
+        self.maxLengthUp = maxLengthUp
+        self.xvel = left
+        self.yvel = up
+        # boltAnim = []
+        # for anim in ANIMATION_MONSTERHORYSONTAL:
+        #     boltAnim.append((anim, 0.3))
+        # self.boltAnim = pyganim.PygAnimation(boltAnim)
+        # self.boltAnim.play()
 
-    def update(self):  # todo функцию перемещения мобов
-        pass
+    def update(self, platforms):  # по принципу героя
 
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        self.image.fill(pygame.Color('black'))  # бета-версия цвета моба
+        # self.boltAnim.blit(self.image, (0, 0))
+
+        self.rect.y += self.yvel
+        self.rect.x += self.xvel
+
+        self.collide(platforms)
+
+        if abs(self.startX - self.rect.x) > self.maxLengthLeft:
+            self.xvel = -self.xvel
+        if abs(self.startY - self.rect.y) > self.maxLengthUp:
+            self.yvel = -self.yvel
+
+    def collide(self, platforms):
+        for p in platforms:
+            if pygame.sprite.collide_rect(self, p) and self != p:
+                self.xvel = - self.xvel
+                self.yvel = - self.yvel
 
 
 class Boss(pygame.sprite.Sprite):  # todo класс босса
