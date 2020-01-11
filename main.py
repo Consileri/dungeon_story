@@ -1,13 +1,16 @@
 import pygame
+from MainApp import all_sprites, player_group
 
 WIDTH_BOSS = 3
 HEIGHT_BOSS = 3
 WIDTH_GG = 1
 HEIGHT_GG = 2
+
 MOVE_SPEED = 2
 FPS = 60
 JUMP_POWER = 10
 GRAVITY = 0.35
+
 PLATFORM_WIDTH = 32
 PLATFORM_HEIGHT = 32
 PLATFORM_COLOR = "#FF6262"
@@ -15,6 +18,11 @@ PLATFORM_COLOR = "#FF6262"
 size = width, height = 500, 500
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
+
+die = False
+hp_hero = 10  # жизни героя
+hp_boss = 20  # жизни босса
+hp_mob = 2  # жизни моба
 
 
 class Board:
@@ -65,9 +73,8 @@ class Player(pygame.sprite.Sprite):
         self.onGround = False  # находится ли герой на поверхности
         self.contact = False
         self.jump = JUMP_POWER
-        self.image = pygame.Surface((WIDTH_GG, HEIGHT_GG))
-        self.image.fill(pygame.Color('yellow'))
-        self.rect = pygame.Rect(x, y, WIDTH_GG, HEIGHT_GG)
+        self.image = player_image
+        self.rect = self.image.get_rect().move(tile_width * x, tile_height * y)
 
     def update(self, left, right, up, platforms):
         if left:
@@ -111,6 +118,13 @@ class Player(pygame.sprite.Sprite):
                 if yvel < 0:                       # если движется вверх
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.yvel = 0                  # и энергия прыжка пропадает
+
+    # def die(self):
+    #     global die
+    #     if hp_hero <= 0:
+    #         die = True
+    #     pygame.time.wait(500)
+    #     game_over()
 
 
 class Platform(pygame.sprite.Sprite):
@@ -161,15 +175,41 @@ class Mob(pygame.sprite.Sprite):  # todo класс мобов
                 self.xvel = - self.xvel
                 self.yvel = - self.yvel
 
-
-class Boss(pygame.sprite.Sprite):  # todo класс босса
-    def __init__(self, x, y):
-        self.startX = x
-        self.startY = y
-        self.image = pygame.Surface((WIDTH_BOSS, HEIGHT_BOSS))
-
-    def update(self):  # todo функцию перемещения босса
+    def die(self):
         pass
 
-    def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+
+class Boss(Mob):
+    def __init__(self, x, y, left, up, maxLengthLeft, maxLengthUp, pyganim=None):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((5, 6))
+        self.image.fill(pygame.Color('black'))
+        self.rect = pygame.Rect(x, y, 5, 6)
+        self.image.set_colorkey(pygame.Color('black'))
+        self.startX = x  # начальные координаты
+        self.startY = y
+        self.maxLengthLeft = maxLengthLeft
+        self.maxLengthUp = maxLengthUp
+        self.xvel = left
+        self.yvel = up
+        # здесь будет анимация
+
+    def update(self, platforms):
+        self.image.fill(pygame.Color('black'))  # бета-версия цвета моба
+        # self.boltAnim.blit(self.image, (0, 0))
+
+        self.rect.y += self.yvel
+        self.rect.x += self.xvel
+
+        self.collide(platforms)
+
+        if abs(self.startX - self.rect.x) > self.maxLengthLeft:
+            self.xvel = -self.xvel
+        if abs(self.startY - self.rect.y) > self.maxLengthUp:
+            self.yvel = -self.yvel
+
+    def collide(self, platforms):
+        for p in platforms:
+            if pygame.sprite.collide_rect(self, p) and self != p:
+                self.xvel = - self.xvel
+                self.yvel = - self.yvel
