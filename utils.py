@@ -1,5 +1,4 @@
 import pygame
-from MainApp import all_sprites, player_group
 
 WIDTH_BOSS = 3
 HEIGHT_BOSS = 3
@@ -23,6 +22,10 @@ die = False
 hp_hero = 10  # жизни героя
 hp_boss = 20  # жизни босса
 hp_mob = 2  # жизни моба
+
+all_sprites = pygame.sprite.Group()
+tiles_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
 
 
 class Board:
