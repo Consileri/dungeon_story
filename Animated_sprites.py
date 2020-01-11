@@ -7,7 +7,7 @@ class AnimatedSpriteDemon(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__(all_sprites)
 
-        frames =  self.cut_sheet(load_image('demon_attack.png'), 4, 4)
+        frames =  self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/attack.png'), 4, 4)
 
         self.frames = {
             #'bottom': self.frames[:4],
@@ -16,9 +16,9 @@ class AnimatedSpriteDemon(pygame.sprite.Sprite):
             'attack_left': frames[12:],
             'idle' : frames[3:4],
         }
-        frames = self.cut_sheet(load_image('demon_death.png'), 7, 1)
+        frames = self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_death.png'), 7, 1)
         self.frames['death'] = frames
-        frames = self.cut_sheet(load_image('demon_walk.png'), 4, 4)
+        frames = self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_walk.png'), 4, 4)
         self.frames['walk_right'] = frames[8:12]
         self.frames['walk_left'] = frames[12:16]
         self.animation = 'walk_left'
@@ -72,22 +72,22 @@ class AnimatedSpriteKnight(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__(all_sprites)
 
-        frames = self.cut_sheet(load_image('knight_slash.png'), 10, 1)
+        frames = self.cut_sheet(load_image('Sprite_sheets/Knight/knight_slash.png'), 10, 1)
 
         self.frames = {
             'attack_right' : frames,
             'attack_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames)),
 
         }
-        frames = self.cut_sheet(load_image('knight_death.png'), 9, 1)
+        frames = self.cut_sheet(load_image('Sprite_sheets/Knight/knight_death.png'), 9, 1)
         self.frames['death_right'] = frames
         frames = list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
         self.frames['death_left'] = frames
-        frames = self.cut_sheet(load_image('knight_walk.png'), 8, 1)
+        frames = self.cut_sheet(load_image('Sprite_sheets/Knight/knight_walk.png'), 8, 1)
         self.frames['walk_right'] = frames
         frames = list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
         self.frames['walk_left'] = frames
-        frames = self.cut_sheet(load_image('knight_idle.png'), 4, 1)
+        frames = self.cut_sheet(load_image('Sprite_sheets/Knight/knight_idle.png'), 4, 1)
         self.frames['idle_right'] = frames
         frames = list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
         self.frames['idle_left'] = frames
@@ -150,3 +150,20 @@ class AnimatedSpriteKnight(pygame.sprite.Sprite):
 class AnimatedSpriteMH(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__(all_sprites)
+
+        frames = self.cut_sheet(load_image('Sprite_sheets/Main_hero/main_hero.png'), 7, 16)
+
+        self.frames = {
+
+        }
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        result = []
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                result.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+        return result
