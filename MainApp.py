@@ -30,11 +30,15 @@ up = False
 right = False
 platforms = []
 
+all_sprites = pygame.sprite.Group()
+tiles_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
+
 def terminate():
     pygame.quit()
     sys.exit()
 
-
+#=======================================================================================================================
 def load_image(name):
     fullname = os.path.join('data', name)
     try:
@@ -44,7 +48,7 @@ def load_image(name):
         raise SystemExit(message)
     image = image.convert_alpha()
     return image
-
+#=======================================================================================================================
 
 def main_screen():  # todo класс заставки
     introtext = ['Чтобы начать игру, '
@@ -89,7 +93,7 @@ def main_screen():  # todo класс заставки
 
         pygame.display.flip()
         clock.tick(FPS)
-
+#=======================================================================================================================
 def game_menu():
     exit_text = ['Выход']
     continue_text = ['Продолжить']
@@ -132,7 +136,7 @@ def game_menu():
                     return
         pygame.display.flip()
         clock.tick(FPS)
-
+#=======================================================================================================================
 running = True
 
 plat = Platform(5, 5)
@@ -142,7 +146,7 @@ player = Player(3, 3)
 boss = Boss(0, 0)
 mob = Mob(5, 6, 0, 0, 0, 0)
 
-
+#=======================================================================================================================
 main_screen()
 while running:
     screen.fill(BACKGROUNDCOLOR)
