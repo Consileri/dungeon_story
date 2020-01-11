@@ -1,9 +1,23 @@
-import pygame
+import pygame, os
+
+
+def load_image(name):
+    fullname = os.path.join('data', name)
+    try:
+        image = pygame.image.load(fullname)
+    except pygame.error as message:
+        print("Can't load image:", name)
+        raise SystemExit(message)
+    image = image.convert_alpha()
+    return image
+
 
 WIDTH_BOSS = 3
 HEIGHT_BOSS = 3
 WIDTH_GG = 1
 HEIGHT_GG = 2
+
+tile_width = tile_height = 32
 
 MOVE_SPEED = 2
 FPS = 60
@@ -26,6 +40,8 @@ hp_mob = 2  # жизни моба
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+
+player_image = pygame.transform.scale(load_image('mario.png'), (32, 32))
 
 
 class Board:
