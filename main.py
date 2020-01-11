@@ -56,6 +56,7 @@ class Board:
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
+        super().__init__(player_group, all_sprites)
         self.xvel = 0
         self.yvel = 0
         self.startX = x
@@ -94,7 +95,7 @@ class Player(pygame.sprite.Sprite):
 
     def collide(self, xvel, yvel, platforms):
         for p in platforms:
-            if pygame.sprite.collide_rect(self, p): # если есть пересечение платформы с игроком
+            if pygame.sprite.collide_rect(self, p):  # если есть пересечение платформы с игроком
 
                 if xvel > 0:                       # если движется вправо
                     self.rect.right = p.rect.left  # то не движется вправо
@@ -133,7 +134,7 @@ class Mob(pygame.sprite.Sprite):  # todo класс мобов
         self.maxLengthUp = maxLengthUp
         self.xvel = left
         self.yvel = up
-        # boltAnim = []
+        boltAnim = []
         # for anim in ANIMATION_MONSTERHORYSONTAL:
         #     boltAnim.append((anim, 0.3))
         # self.boltAnim = pyganim.PygAnimation(boltAnim)
