@@ -1,14 +1,10 @@
 import pygame
-from MainApp import load_image
+from MainApp import load_image, tiles_group, all_sprites
 
 
 tile_images = {'background': load_image('Tileset.png')}
 dicti = {}
 tile_width = tile_height = 50
-
-all_sprites = pygame.sprite.Group()
-tiles_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
 
 
 class Tile(pygame.sprite.Sprite):
@@ -22,7 +18,7 @@ class Tile(pygame.sprite.Sprite):
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
                                 sheet.get_height() // rows)
-        frame_location = (self.rect.w * 256, self.rect.h * 27)
+        frame_location = (self.rect.w * 60, self.rect.h * 120)
 
         dicti["background"] = sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size))
