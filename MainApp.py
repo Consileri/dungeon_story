@@ -1,5 +1,6 @@
 import pygame, sys, os
-from main import Block, Boss, Mob, Player, Board
+from main import Platform, Boss, Mob, Player, Board
+from random import choice
 
 
 COLUMS = 33
@@ -24,6 +25,10 @@ TEXTCOLOR = pygame.Color(218, 189, 171)
 TILE_WIDTH = 32
 TILE_HEIGHT = 32
 FONT = 'agencyfb'
+left = False
+up = False
+right = False
+platforms = []
 
 def terminate():
     pygame.quit()
@@ -89,7 +94,7 @@ def game_menu():
     exit_text = ['Выход']
     continue_text = ['Продолжить']
 
-    background = pygame.transform.scale(load_image('menu.jpg'), (1920, 1080))
+    background = pygame.transform.scale(load_image(choice(['menu.jpg', 'real_menu.jpg', 'real_menu.jpg', 'real_menu.jpg', 'real_menu.jpg'])), (1920, 1080))
     screen.blit(background, (0, 0))
     exit_font = pygame.font.Font(None, 100)
     continue_font = pygame.font.Font(None, 100)
@@ -130,17 +135,18 @@ def game_menu():
 
 running = True
 
-block = Block(5, 5)
+plat = Platform(5, 5)
 cell_size = 80
 board = Board(ROWS, COLUMS, CELL_CIZE)
 player = Player(3, 3)
-boss = Boss()
-mob = Mob(5, 6)
+boss = Boss(0, 0)
+mob = Mob(5, 6, 0, 0, 0, 0)
 
 
 main_screen()
 while running:
     screen.fill(BACKGROUNDCOLOR)
+    player.update(left, right, up, platforms)
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
@@ -157,14 +163,20 @@ while running:
         # W
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                running = False
+                up = True
+                right = False
+                left = False
         # A
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_a:
-                pass
+                up = False
+                right = False
+                left = True
         # D
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_d:
-                pass
+                up = False
+                right = True
+                left = False
     board.render(screen)
     pygame.display.flip()
