@@ -154,7 +154,12 @@ class AnimatedSpriteMH(pygame.sprite.Sprite):
         frames = self.cut_sheet(load_image('Sprite_sheets/Main_hero/main_hero.png'), 7, 16)
 
         self.frames = {
-
+            'idle_right' : frames[0:4],
+            'idle_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[0:4])),
+            'walk_right' : frames[7:14],
+            'walk_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[7:14])),
+            'attack_right' : frames[35:47],
+            'attack_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[35:47]))
         }
 
     def cut_sheet(self, sheet, columns, rows):
@@ -167,3 +172,27 @@ class AnimatedSpriteMH(pygame.sprite.Sprite):
                 result.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
         return result
+
+    def move_left(self):
+        self.cur_frame = 0
+        self.animation = 'walk_left'
+
+    def move_right(self):
+        self.cur_frame = 0
+        self.animation = 'walk_right'
+
+    def attack_right(self):
+        self.cur_frame = 0
+        self.animation = 'attack_right'
+
+    def attack_left(self):
+        self.cur_frame = 0
+        self.animation = 'attack_left'
+
+    def idle_right(self):
+        self.cur_frame = 0
+        self.animation = 'idle_right'
+
+    def idle_left(self):
+        self.cur_frame = 0
+        self.animation = 'idle_left'
