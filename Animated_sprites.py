@@ -161,6 +161,69 @@ class AnimatedSpriteMH(pygame.sprite.Sprite):
             'attack_right' : frames[35:47],
             'attack_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[35:47]))
         }
+        self.animation = 'walk_left'
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        result = []
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                result.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+        return result
+
+    def move_left(self):
+        self.cur_frame = 0
+        self.animation = 'walk_left'
+
+    def move_right(self):
+        self.cur_frame = 0
+        self.animation = 'walk_right'
+
+    def attack_right(self):
+        self.cur_frame = 0
+        self.animation = 'attack_right'
+
+    def attack_left(self):
+        self.cur_frame = 0
+        self.animation = 'attack_left'
+
+    def idle_right(self):
+        self.cur_frame = 0
+        self.animation = 'idle_right'
+
+    def idle_left(self):
+        self.cur_frame = 0
+        self.animation = 'idle_left'
+
+class AnimatedSpriteWizard(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+
+        frames = self.cut_sheet(load_image('Sprite_sheets/Wizard/wizard_idle.png'), 10, 1)
+
+        self.frames = {
+            'idle_right' : frames,
+            'idle_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
+        }
+        frames = self.cut_sheet(load_image('Sprite_sheets/Wizard/wizard_fly_forward.png'), 6, 1)
+        self.frames['walk_right'] = frames
+        self.frames['walk_left'] = list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
+        frames = self.cut_sheet(load_image('Sprite_sheets/Wizard/wizard_death.png'), 6, 1)
+        self.frames['death_right'] = frames
+        self.frames['death_left'] = list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
+        frames = self.cut_sheet(load_image('Sprite_sheets/Wizard/wizard_slash.png'), 6, 1)
+        self.frames['attack_right'] = frames
+        self.frames['attack_left'] = list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
+        self.animation = 'walk_left'
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
