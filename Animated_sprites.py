@@ -39,6 +39,15 @@ class AnimatedSprite(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
         return result
 
+    def update(self):
+        n = len(self.frames[self.animation])
+        self.cur_frame += 1
+        if self.animation == 'death_right' or self.animation == 'death_left' and self.cur_frame == n:
+            self.kill()
+            return
+        self.cur_frame = self.cur_frame % n
+        self.image = self.frames[self.animation][self.cur_frame]
+
 
 class AnimatedSpriteDemon(AnimatedSprite):
     def __init__(self, x, y):
@@ -138,3 +147,4 @@ class AnimatedSpriteWizard(AnimatedSprite):
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
+
