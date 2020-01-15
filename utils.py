@@ -41,6 +41,9 @@ all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 
+WHITE = pygame.Color('white')
+GREEN = pygame.Color('green')
+
 player_image = pygame.transform.scale(load_image('mario.png'), (32, 32))
 
 
@@ -232,3 +235,15 @@ class Boss(Mob):
             if pygame.sprite.collide_rect(self, p) and self != p:
                 self.xvel = - self.xvel
                 self.yvel = - self.yvel
+
+
+def draw_shield_bar(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 10
+    fill = (pct / 100) * BAR_LENGTH
+    outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    pygame.draw.rect(surf, GREEN, fill_rect)
+    pygame.draw.rect(surf, WHITE, outline_rect, 2)
