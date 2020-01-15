@@ -3,46 +3,7 @@ from MainApp import load_image
 
 all_sprites = pygame.sprite.Group()
 
-class AnimatedSpriteDemon(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__(all_sprites)
-
-        frames =  self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/attack.png'), 4, 4)
-
-        self.frames = {
-            #'bottom': self.frames[:4],
-            #'top': self.frames[4:8],
-            'attack_right': frames[8:12],
-            'attack_left': frames[12:],
-            'idle' : frames[3:4],
-        }
-        frames = self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_death.png'), 7, 1)
-        self.frames['death'] = frames
-        frames = self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_walk.png'), 4, 4)
-        self.frames['walk_right'] = frames[8:12]
-        self.frames['walk_left'] = frames[12:16]
-        self.animation = 'walk_left'
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.rect = self.rect.move(x, y)
-
-    def cut_sheet(self, sheet, columns, rows):
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
-                                sheet.get_height() // rows)
-        result = []
-        for j in range(rows):
-            for i in range(columns):
-                frame_location = (self.rect.w * i, self.rect.h * j)
-                result.append(sheet.subsurface(pygame.Rect(
-                    frame_location, self.rect.size)))
-        return result
-    def update(self):
-        if self.animation == 'death' and self.cur_frame == 6:
-            self.kill()
-            return
-        self.cur_frame = (self.cur_frame + 1) % len(self.frames[self.animation])
-        self.image = self.frames[self.animation][self.cur_frame]
-
+class AnimatedSprite(pygame.sprite.Sprite):
     def move_left(self):
         self.cur_frame = 0
         self.animation = 'walk_left'
@@ -67,8 +28,45 @@ class AnimatedSpriteDemon(pygame.sprite.Sprite):
         self.cur_frame = 0
         self.animation = 'death'
 
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        result = []
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                result.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+        return result
 
-class AnimatedSpriteKnight(pygame.sprite.Sprite):
+
+class AnimatedSpriteDemon(AnimatedSprite):
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+
+        frames =  self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/attack.png'), 4, 4)
+
+        self.frames = {
+            #'bottom': self.frames[:4],
+            #'top': self.frames[4:8],
+            'attack_right': frames[8:12],
+            'attack_left': frames[12:],
+            'idle' : frames[3:4],
+        }
+        frames = self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_death.png'), 7, 1)
+        self.frames['death_right'] = frames
+        self.frames['death_left'] = frames
+
+        frames = self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_walk.png'), 4, 4)
+        self.frames['walk_right'] = frames[8:12]
+        self.frames['walk_left'] = frames[12:16]
+        self.animation = 'walk_left'
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+
+class AnimatedSpriteKnight(AnimatedSprite):
     def __init__(self, x, y):
         super().__init__(all_sprites)
 
@@ -96,58 +94,8 @@ class AnimatedSpriteKnight(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
 
-    def cut_sheet(self, sheet, columns, rows):
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
-                                sheet.get_height() // rows)
-        result = []
-        for j in range(rows):
-            for i in range(columns):
-                frame_location = (self.rect.w * i, self.rect.h * j)
-                result.append(sheet.subsurface(pygame.Rect(
-                    frame_location, self.rect.size)))
-        return result
 
-    def update(self):
-        if self.animation == 'death_right' or self.animation == 'death_left' and self.cur_frame == 9:
-            self.kill()
-            return
-        self.cur_frame = (self.cur_frame + 1) % len(self.frames[self.animation])
-        self.image = self.frames[self.animation][self.cur_frame]
-
-    def move_left(self):
-        self.cur_frame = 0
-        self.animation = 'walk_left'
-
-    def move_right(self):
-        self.cur_frame = 0
-        self.animation = 'walk_right'
-
-    def attack_right(self):
-        self.cur_frame = 0
-        self.animation = 'attack_right'
-
-    def attack_left(self):
-        self.cur_frame = 0
-        self.animation = 'attack_left'
-
-    def idle_right(self):
-        self.cur_frame = 0
-        self.animation = 'idle_right'
-
-    def idle_left(self):
-        self.cur_frame = 0
-        self.animation = 'idle_left'
-
-    def death_right(self):
-        self.cur_frame = 0
-        self.animation = 'death_right'
-
-    def death_left(self):
-        self.cur_frame = 0
-        self.animation = 'death_left'
-
-
-class AnimatedSpriteMH(pygame.sprite.Sprite):
+class AnimatedSpriteMH(AnimatedSprite):
     def __init__(self, x, y):
         super().__init__(all_sprites)
 
@@ -166,42 +114,8 @@ class AnimatedSpriteMH(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
 
-    def cut_sheet(self, sheet, columns, rows):
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
-                                sheet.get_height() // rows)
-        result = []
-        for j in range(rows):
-            for i in range(columns):
-                frame_location = (self.rect.w * i, self.rect.h * j)
-                result.append(sheet.subsurface(pygame.Rect(
-                    frame_location, self.rect.size)))
-        return result
 
-    def move_left(self):
-        self.cur_frame = 0
-        self.animation = 'walk_left'
-
-    def move_right(self):
-        self.cur_frame = 0
-        self.animation = 'walk_right'
-
-    def attack_right(self):
-        self.cur_frame = 0
-        self.animation = 'attack_right'
-
-    def attack_left(self):
-        self.cur_frame = 0
-        self.animation = 'attack_left'
-
-    def idle_right(self):
-        self.cur_frame = 0
-        self.animation = 'idle_right'
-
-    def idle_left(self):
-        self.cur_frame = 0
-        self.animation = 'idle_left'
-
-class AnimatedSpriteWizard(pygame.sprite.Sprite):
+class AnimatedSpriteWizard(AnimatedSprite):
     def __init__(self, x, y):
         super().__init__(all_sprites)
 
@@ -224,38 +138,3 @@ class AnimatedSpriteWizard(pygame.sprite.Sprite):
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
-
-    def cut_sheet(self, sheet, columns, rows):
-        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
-                                sheet.get_height() // rows)
-        result = []
-        for j in range(rows):
-            for i in range(columns):
-                frame_location = (self.rect.w * i, self.rect.h * j)
-                result.append(sheet.subsurface(pygame.Rect(
-                    frame_location, self.rect.size)))
-        return result
-
-    def move_left(self):
-        self.cur_frame = 0
-        self.animation = 'walk_left'
-
-    def move_right(self):
-        self.cur_frame = 0
-        self.animation = 'walk_right'
-
-    def attack_right(self):
-        self.cur_frame = 0
-        self.animation = 'attack_right'
-
-    def attack_left(self):
-        self.cur_frame = 0
-        self.animation = 'attack_left'
-
-    def idle_right(self):
-        self.cur_frame = 0
-        self.animation = 'idle_right'
-
-    def idle_left(self):
-        self.cur_frame = 0
-        self.animation = 'idle_left'
