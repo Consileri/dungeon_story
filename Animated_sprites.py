@@ -59,7 +59,7 @@ class AnimatedSprite(pygame.sprite.Sprite):
 
     def update(self):
         n = len(self.frames[self.animation])
-        if self.count % 10 == 0:
+        if self.count % 50 == 0:
             self.cur_frame += 1
             if self.animation == 'death_right' or self.animation == 'death_left' and self.cur_frame == n:
                 self.kill()

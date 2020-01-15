@@ -1,13 +1,15 @@
-import pygame
-from main import Block, Boss, Mob, Player, Board
+import pygame, sys, os
+from Animated_sprites import AnimatedSpriteDemon, AnimatedSpriteKnight, AnimatedSpriteMH, AnimatedSpriteWizard, all_sprites, MOVE_SPEED, JUMP_POWER, GRAVITY
+from random import choice
+
 
 COLUMS = 33
 ROWS = 256
-CELL_CIZE = 32
+tile_width = tile_height = 64
 
 pygame.init()
 
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 size = width, height = screen.get_rect()[2:]
 print(size)
 
@@ -16,17 +18,34 @@ WIDTH_BOSS = 4
 HEIGHT_BOSS = 2
 WIDTH_GG = 1
 HEIGHT_GG = 2
-MOVE_SPEED = 2
 FPS = 60
 BACKGROUNDCOLOR = pygame.Color(64, 32, 0)
 TEXTCOLOR = pygame.Color(218, 189, 171)
+SHADOWTEXT = pygame.Color(218, 189, 171)
+hsv = SHADOWTEXT.hsva
+SHADOWTEXT.hsva = (hsv[0], hsv[1], hsv[2] - 50, hsv[3])
+TILE_WIDTH = 32
+TILE_HEIGHT = 32
+FONT = 'agencyfb'
 
-def terminate():
-    pygame.quit()
-    sys.exit()
+PLATFORM_WIDTH = 32
+PLATFORM_HEIGHT = 32
+PLATFORM_COLOR = "#FF6262"
 
 
-def load_image(name, colorkey=None):
+
+left = False
+up = False
+right = False
+die = False
+platforms = []
+
+
+tiles_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
+
+
+def load_image(name):
     fullname = os.path.join('data', name)
     try:
         image = pygame.image.load(fullname)
@@ -36,24 +55,114 @@ def load_image(name, colorkey=None):
     image = image.convert_alpha()
     return image
 
+#=======================================================================================================================
+tile_images = {'wall': pygame.transform.scale(load_image('box.png'), (64, 64)), 'empty': pygame.transform.scale(load_image('grass.png'), (64, 64)),
+               'undead': pygame.transform.scale(load_image('box.png'), (64, 64))}
+
+#=======================================================================================================================
+
+
+class Board:
+    def __init__(self, width, height, cell_size):
+        self.width = width
+        self.height = height
+        self.board = [[0] * width for _ in range(height)]
+
+        self.left = 0
+        self.top = 0
+        self.cell_size = cell_size
+
+    def set_view(self, left, top, cell_size):
+        self.left = left
+        self.top = top
+        self.cell_size = cell_size
+
+    def render(self, surf):
+        for i, row in enumerate(self.board):
+            for j, cell in enumerate(row):
+                left = self.left + j * self.cell_size
+                top = self.top + i * self.cell_size
+                rect = pygame.Rect((left, top), (self.cell_size,) * 2)
+                width = 0 if cell else 1
+                pygame.draw.rect(surf, (255, 255, 255), rect, width)
+
+    def get_cell(self, mouse_pos):
+        x, y = mouse_pos
+        x1 = (x - self.left) // self.cell_size
+        if x1 < 0 or x1 >= self.width:
+            return None
+
+        y1 = (y - self.left) // self.cell_size
+        if y1 < 0 or y1 >= self.height:
+            return None
+
+        return x1, y1
+
+#=======================================================================================================================
+
+
+#=======================================================================================================================
+
+
+
+#=======================================================================================================================
+
+#=======================================================================================================================
+
+#=======================================================================================================================
+
+
+class Tile(pygame.sprite.Sprite):
+    def __init__(self, tile_type, pos_x, pos_y):#, sheet, columns, rows, x, y):
+        super().__init__(all_sprites, tiles_group)
+        self.image = tile_images[tile_type]
+        self.rect = self.image.get_rect().move(tile_width * pos_x, tile_height * pos_y)
+        #self.cut_sheet(sheet, columns, rows)
+        #self.rect = self.rect.move(x, y)
+
+    #def cut_sheet(self, sheet, columns, rows):
+        #self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+          #                      sheet.get_height() // rows)
+       # frame_location = (self.rect.w * 256, self.rect.h * 27)
+
+       # dicti["background"] = sheet.subsurface(pygame.Rect(
+       #             frame_location, self.rect.size))
+
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+#=======================================================================================================================
 
 def main_screen():  # todo класс заставки
     introtext = ['Чтобы начать игру, '
                  'Нажмите любую кнопку']
     nametext = ['Dungeon story']
+    blackname = ['Dungeon story']
 
     background = pygame.transform.scale(load_image('fon.jpg'), (1920, 1080))
     screen.blit(background, (0, 0))
-    intro_font = pygame.font.Font(None, 75)
-    name_font = pygame.font.Font(None, 125)
-    text_coord = 975
+    intro_font = pygame.font.Font(None, 50)
+    name_font = pygame.font.SysFont(FONT, 150)
+    black_font = pygame.font.SysFont(FONT, 160)
+    text_coord = 1000
     name_coord = 50
+    black_coord = 50
+
+    black_rendered = black_font.render(blackname[0], 1, SHADOWTEXT)
+    black_rect = black_rendered.get_rect()
+    black_coord += 10
+    black_rect.top = black_coord
+    black_rect.x = (1920 - black_rect.width) // 2
+    black_coord += black_rect.height
+    screen.blit(black_rendered, black_rect)
 
     name_rendered = name_font.render(nametext[0], 1, TEXTCOLOR)
     name_rect = name_rendered.get_rect()
     name_coord += 10
     name_rect.top = name_coord
-    name_rect.x = 680
+    name_rect.x = (1920 - name_rect.width) // 2
     name_coord += name_rect.height
     screen.blit(name_rendered, name_rect)
 
@@ -62,7 +171,7 @@ def main_screen():  # todo класс заставки
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 410
+        intro_rect.x = (1920 - intro_rect.width) // 2
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -73,48 +182,172 @@ def main_screen():  # todo класс заставки
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     terminate()
-            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                else:
+                    return
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 return
 
         pygame.display.flip()
         clock.tick(FPS)
+#=======================================================================================================================
+def game_over():
+    background = pygame.transform.scale(load_image('game_over.jpg'), (1920, 1080))
+    screen.blit(background, (0, 0))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.KEYDOWN:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                terminate()
 
+        pygame.display.flip()
+#=======================================================================================================================
+def load_level(filename):
+    filename = "data/" + filename
+    # читаем уровень, убирая символы перевода строки
+    with open(filename, 'r') as mapFile:
+        level_map = [line.strip() for line in mapFile]
+
+    # и подсчитываем максимальную длину
+    max_width = max(map(len, level_map))
+
+    # дополняем каждую строку пустыми клетками ('.')
+    return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+
+
+def generate_level(level, all_sprites, tiles_group, player_group):
+    new_player, x, y = None, None, None
+    for y in range(len(level)):
+        for x in range(len(level[y])):
+            if level[y][x] == ' ':
+                Tile('empty', x, y)
+            elif level[y][x] == '.':
+                Tile('empty', x, y)
+            elif level[y][x] == '#':
+                tile = Tile('wall', x, y)
+                platforms.append(tile)
+            elif level[y][x] == '@':
+                Tile('empty', x, y)
+                new_player = AnimatedSpriteMH(x, y)
+            elif level[y][x] == '$':
+                Tile('empty', x, y)
+                demon = AnimatedSpriteDemon(x, y)
+            elif level[y][x] == '!':
+                Tile('empty', x, y)
+                AnimatedSpriteKnight(x, y)
+            elif level[y][x] == '*':
+                Tile('undead', x, y)
+            elif level[y][x] == '&':
+                Tile('empty', x, y)
+                AnimatedSpriteWizard(x, y)
+
+
+    return demon, new_player, x, y
+
+#=======================================================================================================================
+def game_menu():
+    exit_text = ['Выход']
+    continue_text = ['Продолжить']
+
+    background = pygame.transform.scale(load_image('menu.png'), (1920, 1080))
+    screen.blit(background, (0, 0))
+    exit_font = pygame.font.Font(None, 100)
+    continue_font = pygame.font.Font(None, 100)
+    exit_coord = 600
+    continue_coord = 400
+
+    exit_rendered = exit_font.render(exit_text[0], 1, TEXTCOLOR)
+    exit_rect = exit_rendered.get_rect()
+    exit_coord += 10
+    exit_rect.top = exit_coord
+    exit_rect.x = (1920 - exit_rect.width) // 2
+    exit_coord += exit_rect.height
+    screen.blit(exit_rendered, exit_rect)
+
+    continue_rendered = continue_font.render(continue_text[0], 1, TEXTCOLOR)
+    continue_rect = continue_rendered.get_rect()
+    continue_coord += 10
+    continue_rect.top = continue_coord
+    continue_rect.x = (1920 - continue_rect.width) // 2
+    continue_coord += continue_rect.height
+    screen.blit(continue_rendered, continue_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+                if (pos[0] > exit_rect.x and pos[0] < (exit_rect.width + exit_rect.x)) and (pos[1] > exit_rect.y and pos[1] < (exit_rect.height + exit_rect.y)):
+                    terminate()
+                elif (pos[0] > continue_rect.x and pos[0] < (continue_rect.width + continue_rect.x)) and (pos[1] > continue_rect.y and pos[1] < (continue_rect.height + continue_rect.y)):
+                    return
+        pygame.display.flip()
+        clock.tick(FPS)
+
+#=======================================================================================================================
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
+
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - width // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
+
+#=======================================================================================================================
 running = True
-
-block = Block(5, 5)
+camera = Camera()
 cell_size = 80
-board = Board(size[0] // cell_size , size[1] // cell_size , cell_size)
-player = Player(3, 3)
-boss = Boss()
-mob = Mob()
-
-
+board = Board(ROWS, COLUMS, tile_width)
+#=======================================================================================================================
+main_screen()
+demon, player, level_x, level_y = generate_level(load_level('level.txt'), all_sprites, tiles_group, player_group)
+player.rect.width = 60
+player.rect.height = 60
 while running:
-    screen.fill(BACKGROUNDCOLOR)
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             running = False
 
-        # Выход при нажатии Esc
+        # Выход при нажатии Escwwwdw
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                running = False
+                game_menu()
         # Пробел
         if event.type == pygame.KEYDOWN:
             if event.unicode == ' ':
-                pass
-        # W
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
-                pass
-        # A
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a:
-                pass
-        # D
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_d:
-                pass
+                die = True
+    camera.update(player)
+    # обновляем положение всех спрайтов
+    for sprite in all_sprites:
+        camera.apply(sprite)
+    pressed = pygame.key.get_pressed()
+    up = pressed[pygame.K_w]
+    right = pressed[pygame.K_d]
+    left = pressed[pygame.K_a]
+    if die:
+        game_over()
+    screen.fill(BACKGROUNDCOLOR)
+    player.update2(left, right, up, platforms)
+
+    player.update()
+    demon.update()
+
     board.render(screen)
+    all_sprites.draw(screen)
+    player_group.draw(screen)
     pygame.display.flip()
