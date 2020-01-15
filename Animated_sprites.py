@@ -132,8 +132,8 @@ class AnimatedSpriteMH(AnimatedSprite):
         self.frames = {
             'idle_right' : frames[0:4],
             'idle_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[0:4])),
-            'walk_right' : frames[9:16],
-            'walk_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[9:16])),
+            'walk_right' : frames[9:15],
+            'walk_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[9:15])),
             'attack_right' : frames[35:47],
             'attack_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[35:47]))
         }
