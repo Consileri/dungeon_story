@@ -1,5 +1,5 @@
 import pygame, sys, os
-from Animated_sprites import AnimatedSpriteDemon, AnimatedSpriteKnight, AnimatedSpriteMH, AnimatedSpriteWizard, all_sprites, MOVE_SPEED, JUMP_POWER, GRAVITY
+from Animated_sprites import AnimatedSpriteDemon, AnimatedSpriteKnight, AnimatedSpriteMH, AnimatedSpriteWizard, all_sprites, MOVE_SPEED, JUMP_POWER, GRAVITY, mob_group, player_group
 from random import choice
 
 
@@ -11,53 +11,58 @@ pygame.init()
 
 screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 size = width, height = screen.get_rect()[2:]
-print(size)
 
 clock = pygame.time.Clock()
-WIDTH_BOSS = 4
-HEIGHT_BOSS = 2
-WIDTH_GG = 1
-HEIGHT_GG = 2
 FPS = 60
 BACKGROUNDCOLOR = pygame.Color(64, 32, 0)
 TEXTCOLOR = pygame.Color(218, 189, 171)
 SHADOWTEXT = pygame.Color(218, 189, 171)
 hsv = SHADOWTEXT.hsva
 SHADOWTEXT.hsva = (hsv[0], hsv[1], hsv[2] - 50, hsv[3])
-TILE_WIDTH = 32
-TILE_HEIGHT = 32
 FONT = 'agencyfb'
 
 PLATFORM_WIDTH = 32
 PLATFORM_HEIGHT = 32
 PLATFORM_COLOR = "#FF6262"
 
-
+GREEN = pygame.Color('green')
+WHITE = pygame.Color('white')
 
 left = False
 up = False
 right = False
 die = False
 platforms = []
-
+platforms_2 = []
+mobs = []
 
 tiles_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
 
 
-def load_image(name):
+def newmob():
+    m = AnimatedSpriteWizard(200, 40)
+    all_sprites.add(m)
+    mobs.append(m)
+
+
+def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     try:
         image = pygame.image.load(fullname)
     except pygame.error as message:
         print("Can't load image:", name)
         raise SystemExit(message)
-    image = image.convert_alpha()
+    if colorkey is not None:
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
     return image
 
 #=======================================================================================================================
 tile_images = {'wall': pygame.transform.scale(load_image('box.png'), (64, 64)), 'empty': pygame.transform.scale(load_image('grass.png'), (64, 64)),
-               'undead': pygame.transform.scale(load_image('box.png'), (64, 64))}
+               'grass1': pygame.transform.scale(load_image('grass1.png'), (64, 64))}
 
 #=======================================================================================================================
 
@@ -228,23 +233,28 @@ def generate_level(level, all_sprites, tiles_group, player_group):
             elif level[y][x] == '#':
                 tile = Tile('wall', x, y)
                 platforms.append(tile)
+            elif level[y][x] == '/':
+                tile_2 = Tile('wall', x, y)
+                platforms_2.append(tile_2)
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = AnimatedSpriteMH(x, y)
             elif level[y][x] == '$':
                 Tile('empty', x, y)
-                demon = AnimatedSpriteDemon(x, y)
+                new_demon = AnimatedSpriteDemon(x, y)
+                mobs.append(new_demon)
             elif level[y][x] == '!':
                 Tile('empty', x, y)
-                AnimatedSpriteKnight(x, y)
+                new_knight = AnimatedSpriteKnight(x, y)
+                mobs.append(new_knight)
             elif level[y][x] == '*':
-                Tile('undead', x, y)
+                Tile('grass1', x, y)
             elif level[y][x] == '&':
                 Tile('empty', x, y)
-                AnimatedSpriteWizard(x, y)
+                new_wizard = AnimatedSpriteWizard(x, y)
+                mobs.append(new_wizard)
 
-
-    return demon, new_player, x, y
+    return new_wizard, new_knight, new_demon, new_player, x, y
 
 #=======================================================================================================================
 def game_menu():
@@ -307,23 +317,73 @@ class Camera:
         self.dx = -(target.rect.x + target.rect.w // 2 - width // 2)
         self.dy = -(target.rect.y + target.rect.h // 2 - height // 2)
 
+
+def draw_shield_bar(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 300
+    BAR_HEIGHT = 30
+    fill = (pct / 100) * BAR_LENGTH
+    outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    pygame.draw.rect(surf, GREEN, fill_rect)
+    pygame.draw.rect(surf, WHITE, outline_rect, 2)
+
+
+def draw_shield_bar_demon(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 50
+    BAR_HEIGHT = 10
+    fill = (pct / 100) * BAR_LENGTH
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    pygame.draw.rect(surf, pygame.Color('red'), fill_rect)
+
 #=======================================================================================================================
 running = True
 camera = Camera()
 cell_size = 80
-board = Board(ROWS, COLUMS, tile_width)
+
 #=======================================================================================================================
 main_screen()
-demon, player, level_x, level_y = generate_level(load_level('level.txt'), all_sprites, tiles_group, player_group)
+wizard, knight, demon, player, level_x, level_y = generate_level(load_level('level.txt'), all_sprites, tiles_group, player_group)
 player.rect.width = 60
 player.rect.height = 60
+demon.rect.w = demon.rect.h = 256
+wizard.rect.x -= 200
+knight.rect.x -= 200
+demon.rect.x -= 200
+
+max_kn = knight.rect.x
+
+# hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_mask)
+
 while running:
+    rasst_dem = player.rect.center[0] - demon.rect.center[0]
+    for m in mobs:
+        if pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask):
+            player.shield -= 1
+
+    for p in platforms:
+        if pygame.sprite.collide_rect(knight, p):
+            pass
+
+    if player.shield <= 0:
+        running = False
+    if wizard.shield <= 0:
+        wizard.kill()
+    if knight.shield <= 0:
+        knight.kill()
+    if demon.shield < 0:
+        demon.kill()
+        demon.shield = 0
+
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
             running = False
 
-        # Выход при нажатии Escwwwdw
+        # Выход при нажатии Esc
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_menu()
@@ -331,6 +391,21 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.unicode == ' ':
                 die = True
+
+            if event.key == pygame.K_l:
+                if -128 < rasst_dem < 128:
+                    demon.shield -= 5
+
+                if rasst < 128:
+                    wizard.shield -= 5
+                elif rasst > -128:
+                    wizard.shield -= 5
+
+                if rasst_kn < 128:
+                    knight.shield -= 5
+                elif rasst_kn > -128:
+                    knight.shield -= 5
+
     camera.update(player)
     # обновляем положение всех спрайтов
     for sprite in all_sprites:
@@ -339,15 +414,60 @@ while running:
     up = pressed[pygame.K_w]
     right = pressed[pygame.K_d]
     left = pressed[pygame.K_a]
+    rasst = player.rect.x - wizard.rect.x
+    rasst_kn = player.rect.x - knight.rect.x
+    rasst_dem = player.rect.center[0] - demon.rect.center[0]
+
     if die:
         game_over()
     screen.fill(BACKGROUNDCOLOR)
     player.update2(left, right, up, platforms)
 
-    player.update()
-    demon.update()
+    if rasst_dem > 128:
+        demon.move_left()
+    elif rasst_dem < -128:
+        demon.move_right()
+    else:
+        if rasst_dem >= 0:
+            demon.attack_right()
+        else:
+            demon.attack_left()
 
-    board.render(screen)
-    all_sprites.draw(screen)
+    if rasst > 128:
+        wizard.rect.x += 2
+        wizard.move_left()
+    elif rasst < -128:
+        wizard.rect.x -= 2
+        wizard.move_right()
+    else:
+        if rasst > 0:
+            wizard.attack_right()
+        else:
+            wizard.attack_left()
+
+    if rasst_kn > 128:
+        if knight.rect.x < max_kn + 300:
+            knight.rect.x += 2
+            knight.move_left()
+    elif rasst_kn < -128:
+        knight.rect.x -= 2
+        knight.move_right()
+    else:
+        if rasst_kn > 0:
+            knight.attack_right()
+        else:
+            knight.attack_left()
+
+    player.update()
+    demon.update1()
+    knight.update()
+    wizard.update()
+
+    tiles_group.draw(screen)
+    mob_group.draw(screen)
     player_group.draw(screen)
+    draw_shield_bar(screen, 5, 5, player.shield)
+    draw_shield_bar_demon(screen, demon.rect.x, demon.rect.y, demon.shield)
     pygame.display.flip()
+
+pygame.quit()
