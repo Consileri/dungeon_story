@@ -1,6 +1,6 @@
 import pygame, sys, os
 from Animated_sprites import AnimatedSpriteDemon, AnimatedSpriteKnight, AnimatedSpriteMH, AnimatedSpriteWizard, all_sprites, MOVE_SPEED, JUMP_POWER, GRAVITY, mob_group, player_group
-from random import choice
+from shield_bars import draw_shield_bar_demon, draw_shield_bar_mobs
 
 
 COLUMS = 33
@@ -37,12 +37,6 @@ platforms_2 = []
 mobs = []
 
 tiles_group = pygame.sprite.Group()
-
-
-def newmob():
-    m = AnimatedSpriteWizard(200, 40)
-    all_sprites.add(m)
-    mobs.append(m)
 
 
 def load_image(name, colorkey=None):
@@ -132,8 +126,6 @@ class Tile(pygame.sprite.Sprite):
 
        # dicti["background"] = sheet.subsurface(pygame.Rect(
        #             frame_location, self.rect.size))
-
-
 
 def terminate():
     pygame.quit()
@@ -328,17 +320,6 @@ def draw_shield_bar(surf, x, y, pct):
     fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
     pygame.draw.rect(surf, GREEN, fill_rect)
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
-
-
-def draw_shield_bar_demon(surf, x, y, pct):
-    if pct < 0:
-        pct = 0
-    BAR_LENGTH = 50
-    BAR_HEIGHT = 10
-    fill = (pct / 100) * BAR_LENGTH
-    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
-    pygame.draw.rect(surf, pygame.Color('red'), fill_rect)
-
 #=======================================================================================================================
 running = True
 camera = Camera()
@@ -354,12 +335,12 @@ wizard.rect.x -= 200
 knight.rect.x -= 200
 demon.rect.x -= 200
 
-max_kn = knight.rect.x
-
-# hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_mask)
-
 while running:
     rasst_dem = player.rect.center[0] - demon.rect.center[0]
+    rasst = player.rect.center[0] - wizard.rect.center[0]
+    rasst_move = player.rect.x - wizard.rect.x
+    rasst_kn = player.rect.center[0] - knight.rect.center[0]
+    rasst_kn_move = player.rect.x - knight.rect.x
     for m in mobs:
         if pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask):
             player.shield -= 1
@@ -396,14 +377,10 @@ while running:
                 if -128 < rasst_dem < 128:
                     demon.shield -= 5
 
-                if rasst < 128:
-                    wizard.shield -= 5
-                elif rasst > -128:
+                elif -128 < rasst < 128:
                     wizard.shield -= 5
 
-                if rasst_kn < 128:
-                    knight.shield -= 5
-                elif rasst_kn > -128:
+                elif -128 < rasst_kn < 128:
                     knight.shield -= 5
 
     camera.update(player)
@@ -414,9 +391,6 @@ while running:
     up = pressed[pygame.K_w]
     right = pressed[pygame.K_d]
     left = pressed[pygame.K_a]
-    rasst = player.rect.x - wizard.rect.x
-    rasst_kn = player.rect.x - knight.rect.x
-    rasst_dem = player.rect.center[0] - demon.rect.center[0]
 
     if die:
         game_over()
@@ -433,7 +407,7 @@ while running:
         else:
             demon.attack_left()
 
-    if rasst > 128:
+    if rasst_move > 128:
         wizard.rect.x += 2
         wizard.move_left()
     elif rasst < -128:
@@ -445,10 +419,9 @@ while running:
         else:
             wizard.attack_left()
 
-    if rasst_kn > 128:
-        if knight.rect.x < max_kn + 300:
-            knight.rect.x += 2
-            knight.move_left()
+    if rasst_kn_move > 128:
+        knight.rect.x += 2
+        knight.move_left()
     elif rasst_kn < -128:
         knight.rect.x -= 2
         knight.move_right()
@@ -468,6 +441,8 @@ while running:
     player_group.draw(screen)
     draw_shield_bar(screen, 5, 5, player.shield)
     draw_shield_bar_demon(screen, demon.rect.x, demon.rect.y, demon.shield)
+    draw_shield_bar_mobs(screen, knight.rect.x, knight.rect.y, knight.shield)
+    draw_shield_bar_mobs(screen, wizard.rect.x, wizard.rect.y, wizard.shield)
     pygame.display.flip()
 
 pygame.quit()
