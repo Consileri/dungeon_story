@@ -373,6 +373,7 @@ while running:
             if event.unicode == ' ':
                 die = True
 
+            # реализация атаки Главного Героя
             if event.key == pygame.K_l:
                 if -128 < rasst_dem < 128:
                     demon.shield -= 5
@@ -410,23 +411,23 @@ while running:
     if rasst_move > 128:
         wizard.rect.x += 2
         wizard.move_left()
-    elif rasst < -128:
+    elif rasst_move < -128:
         wizard.rect.x -= 2
         wizard.move_right()
     else:
-        if rasst > 0:
+        if rasst_move > 0:
             wizard.attack_right()
         else:
             wizard.attack_left()
 
     if rasst_kn_move > 128:
         knight.rect.x += 2
-        knight.move_left()
-    elif rasst_kn < -128:
-        knight.rect.x -= 2
         knight.move_right()
+    elif rasst_kn_move < -128:
+        knight.rect.x -= 2
+        knight.move_left()
     else:
-        if rasst_kn > 0:
+        if rasst_kn_move > 0:
             knight.attack_right()
         else:
             knight.attack_left()
