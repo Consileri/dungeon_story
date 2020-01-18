@@ -1,4 +1,5 @@
-import pygame, os
+import pygame
+import os
 
 MOVE_SPEED = 10
 MOB_SPEED = 3
@@ -103,11 +104,11 @@ class AnimatedSpriteDemon(AnimatedSprite):
         frames =  self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_attack.png', -1), 4, 4)
 
         self.frames = {
-            #'bottom': self.frames[:4],
-            #'top': self.frames[4:8],
+            # 'bottom': self.frames[:4],
+            # 'top': self.frames[4:8],
             'attack_right': frames[8:12],
             'attack_left': frames[12:],
-            'idle' : frames[3:4],
+            'idle': frames[3:4],
         }
         frames = self.cut_sheet(load_image('Sprite_sheets/Demon_Boss/demon_death.png', -1), 7, 1)
         self.frames['death_right'] = frames
@@ -167,6 +168,8 @@ class AnimatedSpriteKnight(AnimatedSprite):
         self.image = self.frames[self.animation][self.cur_frame]
         self.rect = self.rect.move(x * tile_width, y * tile_width)
         self.shield = 60
+        self.maximal = 0
+        self.xvel = 2
 
     def idle_left(self):
         if self.animation == 'idle_left':
@@ -180,6 +183,21 @@ class AnimatedSpriteKnight(AnimatedSprite):
         self.cur_frame = 0
         self.animation = 'idle_right'
 
+    def update2(self):
+        if self.shield <= 0:
+            self.kill()
+
+        self.rect.x += self.xvel
+        self.maximal += self.xvel
+
+        if self.maximal > 500:
+            self.xvel = -self.xvel
+            self.move_left()
+
+        elif self.maximal < 0:
+            self.xvel = -self.xvel
+            self.move_right()
+
 
 class AnimatedSpriteMH(AnimatedSprite):
     def __init__(self, x, y):
@@ -190,12 +208,12 @@ class AnimatedSpriteMH(AnimatedSprite):
         frames = self.cut_sheet(load_image('Sprite_sheets/Main_hero/main_hero.png'), 8, 16)
 
         self.frames = {
-            'idle_right' : frames[0:4],
-            'idle_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[0:4])),
-            'walk_right' : frames[9:15],
-            'walk_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[9:15])),
-            'attack_right' : frames[35:47],
-            'attack_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[35:47]))
+            'idle_right': frames[0:4],
+            'idle_left': list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[0:4])),
+            'walk_right': frames[9:15],
+            'walk_left': list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[9:15])),
+            'attack_right': frames[35:47],
+            'attack_left': list(map(lambda surface: pygame.transform.flip(surface, True, False), frames[35:47]))
         }
         self.animation = 'idle_right'
         self.cur_frame = 0
@@ -204,7 +222,7 @@ class AnimatedSpriteMH(AnimatedSprite):
         self.yvel = 0
         self.image = self.frames[self.animation][self.cur_frame]
         self.rect = self.rect.move(x * tile_width, y * tile_width)
-        self.shield = 1000
+        self.shield = 100
 
     def update2(self, left, right, up, platforms):
         if left:
@@ -269,8 +287,8 @@ class AnimatedSpriteWizard(AnimatedSprite):
         frames = self.cut_sheet(load_image('Sprite_sheets/Wizard/wizard_idle.png', -1), 10, 1)
 
         self.frames = {
-            'idle_right' : frames,
-            'idle_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
+            'idle_right': frames,
+            'idle_left': list(map(lambda surface: pygame.transform.flip(surface, True, False), frames))
         }
         frames = self.cut_sheet(load_image('Sprite_sheets/Wizard/wizard_fly_forward.png', -1), 6, 1)
         self.frames['walk_right'] = frames
@@ -287,6 +305,9 @@ class AnimatedSpriteWizard(AnimatedSprite):
         self.rect = self.rect.move(x * tile_width, y * tile_width)
         self.onGround = True
         self.shield = 30
+        self.xvel = 2
+        self.startX = self.rect.x
+        self.maximal = 0
 
     def idle_left(self):
         if self.animation == 'idle_left':
@@ -299,4 +320,19 @@ class AnimatedSpriteWizard(AnimatedSprite):
             return
         self.cur_frame = 0
         self.animation = 'idle_right'
+
+    def update2(self):
+        if self.shield <= 0:
+            self.kill()
+
+        self.rect.x += self.xvel
+        self.maximal += self.xvel
+
+        if self.maximal > 500:
+            self.xvel = -self.xvel
+            self.move_right()
+
+        elif self.maximal < 0:
+            self.xvel = -self.xvel
+            self.move_left()
 
