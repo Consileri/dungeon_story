@@ -147,8 +147,8 @@ class AnimatedSpriteKnight(AnimatedSprite):
         frames = self.cut_sheet(load_image('Sprite_sheets/Knight/knight_slash.png'), 10, 1)
 
         self.frames = {
-            'attack_right' : frames,
-            'attack_left' : list(map(lambda surface: pygame.transform.flip(surface, True, False), frames)),
+            'attack_right': frames,
+            'attack_left': list(map(lambda surface: pygame.transform.flip(surface, True, False), frames)),
 
         }
         frames = self.cut_sheet(load_image('Sprite_sheets/Knight/knight_death.png'), 9, 1)
@@ -190,7 +190,7 @@ class AnimatedSpriteKnight(AnimatedSprite):
         self.rect.x += self.xvel
         self.maximal += self.xvel
 
-        if self.maximal > 500:
+        if self.maximal > 250:
             self.xvel = -self.xvel
             self.move_left()
 
