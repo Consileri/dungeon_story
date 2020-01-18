@@ -228,7 +228,7 @@ while running:
 
     for m in mobs:
         if pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_mask):
-            player.shield -= 0.2
+            player.shield -= 0.07
 
     if player.shield <= 0:
         die = True
@@ -252,7 +252,7 @@ while running:
                     if -800 > player.rect.center[0] - wz.rect.center[0] > -900:
                         wz.shield -= 5
                 for kn in kn_list:
-                    if -128 < player.rect.center[0] - kn.rect.center[0] < 128:
+                    if -80 < player.rect.center[0] - kn.rect.center[0] < 80:
                         kn.shield -= 5
 
     camera.update(player)
@@ -287,15 +287,15 @@ while running:
             demon.attack_left()
 
     for wz in wz_list:
-        if -128 < player.rect.x - wz.rect.x < 0:
+        if -128 < player.rect.x - wz.rect.x < 0 and -32 < player.rect.y - wz.rect.y < 0:
             wz.attack_right()
-        elif 0 < player.rect.x - wz.rect.x < 128:
+        elif 0 < player.rect.x - wz.rect.x < 128 and 0 < player.rect.y - wz.rect.y < 32:
             wz.attack_left()
 
     for kn in kn_list:
-        if -128 < player.rect.x - kn.rect.x < 0:
+        if -128 < player.rect.x - kn.rect.x < 0 and -32 < player.rect.y - kn.rect.y < 0:
             kn.attack_left()
-        elif 0 < player.rect.x - kn.rect.x < 128:
+        elif 0 < player.rect.x - kn.rect.x < 128 and 0 < player.rect.y - kn.rect.y < 32:
             kn.attack_right()
 
     player.update()
