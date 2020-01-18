@@ -120,7 +120,20 @@ def game_over():
                 terminate()
 
         pygame.display.flip()
+        
+def win():
+    background = pygame.transform.scale(load_image('win.jpg'), (1920, 1080))
+    screen.blit(background, (0, 0))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.KEYDOWN:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                terminate()
 
+        pygame.display.flip()
 
 def generate_level(level, all_sprites, tiles_group, player_group):
     new_player, x, y = None, None, None
@@ -247,6 +260,8 @@ while running:
                 player.attack_left()
                 if -128 < rasst_dem < 128:
                     demon.shield -= 5
+                    if demon.shield == 0:
+                        win()
 
                 for wz in wz_list:
                     if -800 > player.rect.center[0] - wz.rect.center[0] > -900:
