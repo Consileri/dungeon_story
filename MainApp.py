@@ -244,8 +244,8 @@ while running:
 
             # реализация атаки Главного Героя
             if event.key == pygame.K_l:
+                player.attack_left()
                 if -128 < rasst_dem < 128:
-                    player.attack_left()
                     demon.shield -= 5
 
                 for wz in wz_list:
